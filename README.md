@@ -39,13 +39,19 @@ poetry run uvicorn backend.app:app --reload
 ```bash
 poetry install
 ```
-3. Run tests
+3. Install pre-commit hooks
+
+```bash
+poetry run pre-commit install
+```
+
+4. Run tests
 
 ```bash
 poetry run pytest
 ```
 
-4. Run the application
+5. Run the application
 
 ```bash
 poetry run uvicorn backend.app:app --reload
