@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 
 from datetime import datetime
+from enum import Enum
 
-class StatusEnum(str):
+class StatusEnum(str, Enum):
     not_started = "not_started"
     started = "started"
     complete = "complete"
@@ -16,7 +17,6 @@ class Book(BaseModel):
 
 class CreateUser(BaseModel):
     username: str
-    name: str
     password: str
     confirm_password: str
 
@@ -29,6 +29,9 @@ class User(BaseModel):
     username: str
     reads: int | None = None
     total_books: int | None = None
+
+class Token(User):
+    token: str
 
 class EditReadingList(BaseModel):
     book_id: int

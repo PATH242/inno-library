@@ -1,4 +1,3 @@
-from .const import SQLITE_DB
 import sqlite3
 
 def create_tables(conn: sqlite3.Connection):
@@ -47,10 +46,10 @@ def create_tables(conn: sqlite3.Connection):
             book INTEGER NOT NULL,
             user INTEGER NOT NULL,
             reading_status TEXT NOT NULL,
-            foreign key(book) references books(id),
-            foreign key(user) references users(id),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (book) REFERENCES books (id),
+            FOREIGN KEY (user) REFERENCES users (id)
         )
     """)
     conn.commit()
@@ -75,6 +74,11 @@ def get_book(book_id, conn: sqlite3.Connection):
     """, (book_id,))
     book = cursor.fetchone()
     return book
+
+def search_book_by_title(title, conn: sqlite3.Connection):
+    cursor = conn.execute("""
+        SELECT * FROM books WHERE title LIKE ?
+    """, (f"%{title}%",))
 
 def update_book(book_id, title, author, genre, conn: sqlite3.Connection):
     conn.execute("""
@@ -111,6 +115,13 @@ def get_user(user_id, conn: sqlite3.Connection):
     cursor = conn.execute("""
         SELECT * FROM users WHERE id = ?
     """, (user_id,))
+    user = cursor.fetchone()
+    return user
+
+def get_user_by_username(username, conn: sqlite3.Connection):
+    cursor = conn.execute("""
+        SELECT * FROM users WHERE username = ?
+    """, (username,))
     user = cursor.fetchone()
     return user
 

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SQLITE_DB = os.environ.get("SQLITE_DB", 'sqlite:///db.sqlite3')
+SQLITE_DB = os.environ.get("SQLITE_DB", 'db.sqlite3')
 
 SECRET_KEY = os.environ.get("JWT_SECRET")
 ALGORITHM = os.environ.get("JWT_ALGORITHM")
