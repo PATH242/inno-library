@@ -1,0 +1,462 @@
+[
+  {
+    "title": "1984",
+    "author": "George Orwell",
+    "genre": "Dystopian"
+  },
+  {
+    "title": "A Clockwork Orange",
+    "author": "Anthony Burgess",
+    "genre": "Dystopian"
+  },
+  {
+    "title": "A Game of Thrones",
+    "author": "George R.R. Martin",
+    "genre": "Fantasy"
+  },
+  {
+    "title": "A Tale of Two Cities",
+    "author": "Charles Dickens",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "American Gods",
+    "author": "Neil Gaiman",
+    "genre": "Fantasy"
+  },
+  {
+    "title": "Anna Karenina",
+    "author": "Leo Tolstoy",
+    "genre": "Realistic Fiction"
+  },
+  {
+    "title": "Atonement",
+    "author": "Ian McEwan",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "Beloved",
+    "author": "Toni Morrison",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "Brave New World",
+    "author": "Aldous Huxley",
+    "genre": "Dystopian"
+  },
+  {
+    "title": "Cloud Atlas",
+    "author": "David Mitchell",
+    "genre": "Literary Fiction"
+  },
+  {
+    "title": "Crime and Punishment",
+    "author": "Fyodor Dostoevsky",
+    "genre": "Psychological Fiction"
+  },
+  {
+    "title": "Don Quixote",
+    "author": "Miguel de Cervantes",
+    "genre": "Classic"
+  },
+  {
+    "title": "Dune",
+    "author": "Frank Herbert",
+    "genre": "Science Fiction"
+  },
+  {
+    "title": "East of Eden",
+    "author": "John Steinbeck",
+    "genre": "Family Saga"
+  },
+  {
+    "title": "Educated",
+    "author": "Tara Westover",
+    "genre": "Memoir"
+  },
+  {
+    "title": "Ender's Game",
+    "author": "Orson Scott Card",
+    "genre": "Science Fiction"
+  },
+  {
+    "title": "Frankenstein",
+    "author": "Mary Shelley",
+    "genre": "Gothic"
+  },
+  {
+    "title": "Gone Girl",
+    "author": "Gillian Flynn",
+    "genre": "Mystery"
+  },
+  {
+    "title": "Gone with the Wind",
+    "author": "Margaret Mitchell",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "Great Expectations",
+    "author": "Charles Dickens",
+    "genre": "Classic"
+  },
+  {
+    "title": "Jane Eyre",
+    "author": "Charlotte Brontë",
+    "genre": "Gothic"
+  },
+  {
+    "title": "Les Misérables",
+    "author": "Victor Hugo",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "Life of Pi",
+    "author": "Yann Martel",
+    "genre": "Adventure"
+  },
+  {
+    "title": "Little Fires Everywhere",
+    "author": "Celeste Ng",
+    "genre": "Contemporary Fiction"
+  },
+  {
+    "title": "Little Women",
+    "author": "Louisa May Alcott",
+    "genre": "Coming-of-age"
+  },
+  {
+    "title": "Memoirs of a Geisha",
+    "author": "Arthur Golden",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "Middlemarch",
+    "author": "George Eliot",
+    "genre": "Realistic Fiction"
+  },
+  {
+    "title": "Moby-Dick",
+    "author": "Herman Melville",
+    "genre": "Adventure"
+  },
+  {
+    "title": "Never Let Me Go",
+    "author": "Kazuo Ishiguro",
+    "genre": "Dystopian"
+  },
+  {
+    "title": "Norwegian Wood",
+    "author": "Haruki Murakami",
+    "genre": "Magical Realism"
+  },
+  {
+    "title": "One Hundred Years of Solitude",
+    "author": "Gabriel García Márquez",
+    "genre": "Magical Realism"
+  },
+  {
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "genre": "Romance"
+  },
+  {
+    "title": "Slaughterhouse-Five",
+    "author": "Kurt Vonnegut",
+    "genre": "Science Fiction"
+  },
+  {
+    "title": "The Adventures of Huckleberry Finn",
+    "author": "Mark Twain",
+    "genre": "Adventure"
+  },
+  {
+    "title": "The Adventures of Sherlock Holmes",
+    "author": "Arthur Conan Doyle",
+    "genre": "Mystery"
+  },
+  {
+    "title": "The Alchemist",
+    "author": "Paulo Coelho",
+    "genre": "Fantasy"
+  },
+  {
+    "title": "The Bell Jar",
+    "author": "Sylvia Plath",
+    "genre": "Autobiographical Fiction"
+  },
+  {
+    "title": "The Book Thief",
+    "author": "Markus Zusak",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "The Book of Lost Things",
+    "author": "John Connolly",
+    "genre": "Fantasy"
+  },
+  {
+    "title": "The Brothers Karamazov",
+    "author": "Fyodor Dostoevsky",
+    "genre": "Philosophical Fiction"
+  },
+  {
+    "title": "The Catcher in the Rye",
+    "author": "J.D. Salinger",
+    "genre": "Literary Fiction"
+  },
+  {
+    "title": "The Color Purple",
+    "author": "Alice Walker",
+    "genre": "Drama"
+  },
+  {
+    "title": "The Count of Monte Cristo",
+    "author": "Alexandre Dumas",
+    "genre": "Adventure"
+  },
+  {
+    "title": "The Da Vinci Code",
+    "author": "Dan Brown",
+    "genre": "Mystery"
+  },
+  {
+    "title": "The Girl on the Train",
+    "author": "Paula Hawkins",
+    "genre": "Mystery"
+  },
+  {
+    "title": "The Girl with the Dragon Tattoo",
+    "author": "Stieg Larsson",
+    "genre": "Mystery"
+  },
+  {
+    "title": "The Giver",
+    "author": "Lois Lowry",
+    "genre": "Young Adult"
+  },
+  {
+    "title": "The Glass Castle",
+    "author": "Jeannette Walls",
+    "genre": "Memoir"
+  },
+  {
+    "title": "The Goldfinch",
+    "author": "Donna Tartt",
+    "genre": "Literary Fiction"
+  },
+  {
+    "title": "The Grapes of Wrath",
+    "author": "John Steinbeck",
+    "genre": "Classic"
+  },
+  {
+    "title": "The Great Alone",
+    "author": "Kristin Hannah",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "genre": "Classic"
+  },
+  {
+    "title": "The Handmaid's Tale",
+    "author": "Margaret Atwood",
+    "genre": "Dystopian"
+  },
+  {
+    "title": "The Help",
+    "author": "Kathryn Stockett",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "The Hitchhiker's Guide to the Galaxy",
+    "author": "Douglas Adams",
+    "genre": "Science Fiction"
+  },
+  {
+    "title": "The Hobbit",
+    "author": "J.R.R. Tolkien",
+    "genre": "Fantasy"
+  },
+  {
+    "title": "The Hunger Games",
+    "author": "Suzanne Collins",
+    "genre": "Dystopian"
+  },
+  {
+    "title": "The Immortalists",
+    "author": "Chloe Benjamin",
+    "genre": "Magical Realism"
+  },
+  {
+    "title": "The Kite Runner",
+    "author": "Khaled Hosseini",
+    "genre": "Contemporary Fiction"
+  },
+  {
+    "title": "The Lord of the Rings",
+    "author": "J.R.R. Tolkien",
+    "genre": "Fantasy"
+  },
+  {
+    "title": "The Lovely Bones",
+    "author": "Alice Sebold",
+    "genre": "Contemporary Fiction"
+  },
+  {
+    "title": "The Martian",
+    "author": "Andy Weir",
+    "genre": "Science Fiction"
+  },
+  {
+    "title": "The Martian Chronicles",
+    "author": "Ray Bradbury",
+    "genre": "Science Fiction"
+  },
+  {
+    "title": "The Name of the Rose",
+    "author": "Umberto Eco",
+    "genre": "Historical Mystery"
+  },
+  {
+    "title": "The Name of the Wind",
+    "author": "Patrick Rothfuss",
+    "genre": "Fantasy"
+  },
+  {
+    "title": "The Night Circus",
+    "author": "Erin Morgenstern",
+    "genre": "Fantasy"
+  },
+  {
+    "title": "The Nightingale",
+    "author": "Kristin Hannah",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "The Odyssey",
+    "author": "Homer",
+    "genre": "Epic Poetry"
+  },
+  {
+    "title": "The Old Man and the Sea",
+    "author": "Ernest Hemingway",
+    "genre": "Adventure"
+  },
+  {
+    "title": "The Outsiders",
+    "author": "S.E. Hinton",
+    "genre": "Young Adult"
+  },
+  {
+    "title": "The Perks of Being a Wallflower",
+    "author": "Stephen Chbosky",
+    "genre": "Young Adult"
+  },
+  {
+    "title": "The Picture of Dorian Gray",
+    "author": "Oscar Wilde",
+    "genre": "Gothic"
+  },
+  {
+    "title": "The Pillars of the Earth",
+    "author": "Ken Follett",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "The Power",
+    "author": "Naomi Alderman",
+    "genre": "Dystopian"
+  },
+  {
+    "title": "The Road",
+    "author": "Cormac McCarthy",
+    "genre": "Post-apocalyptic"
+  },
+  {
+    "title": "The Road Less Traveled",
+    "author": "M. Scott Peck",
+    "genre": "Self-help"
+  },
+  {
+    "title": "The Road to Wigan Pier",
+    "author": "George Orwell",
+    "genre": "Non-fiction"
+  },
+  {
+    "title": "The Scarlet Letter",
+    "author": "Nathaniel Hawthorne",
+    "genre": "Classic"
+  },
+  {
+    "title": "The Secret Garden",
+    "author": "Frances Hodgson Burnett",
+    "genre": "Children's Literature"
+  },
+  {
+    "title": "The Secret History",
+    "author": "Donna Tartt",
+    "genre": "Mystery"
+  },
+  {
+    "title": "The Shadow of the Wind",
+    "author": "Carlos Ruiz Zafón",
+    "genre": "Mystery"
+  },
+  {
+    "title": "The Shining",
+    "author": "Stephen King",
+    "genre": "Horror"
+  },
+  {
+    "title": "The Silence of the Lambs",
+    "author": "Thomas Harris",
+    "genre": "Thriller"
+  },
+  {
+    "title": "The Stand",
+    "author": "Stephen King",
+    "genre": "Post-apocalyptic"
+  },
+  {
+    "title": "The Sun Also Rises",
+    "author": "Ernest Hemingway",
+    "genre": "Modernist"
+  },
+  {
+    "title": "The Thorn Birds",
+    "author": "Colleen McCullough",
+    "genre": "Historical Fiction"
+  },
+  {
+    "title": "The Time Machine",
+    "author": "H.G. Wells",
+    "genre": "Science Fiction"
+  },
+  {
+    "title": "The Time Traveler's Wife",
+    "author": "Audrey Niffenegger",
+    "genre": "Science Fiction"
+  },
+  {
+    "title": "To Kill a Mockingbird",
+    "author": "Harper Lee",
+    "genre": "Fiction"
+  },
+  {
+    "title": "To the Lighthouse",
+    "author": "Virginia Woolf",
+    "genre": "Modernist"
+  },
+  {
+    "title": "Where the Crawdads Sing",
+    "author": "Delia Owens",
+    "genre": "Mystery"
+  },
+  {
+    "title": "Wuthering Heights",
+    "author": "Emily Brontë",
+    "genre": "Gothic"
+  }
+]

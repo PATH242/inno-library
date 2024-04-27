@@ -1,4 +1,6 @@
 import sqlite3
+import json
+import os
 
 def create_tables(conn: sqlite3.Connection):
     # {
@@ -54,6 +56,30 @@ def create_tables(conn: sqlite3.Connection):
     """)
     conn.commit()
 
+    # check if there is any book in the database
+    cursor = conn.execute("""
+        SELECT * FROM books
+    """)
+    books = cursor.fetchall()
+    if not books:
+        with open(f"{os.path.dirname(__file__)}/data/books.json", "r") as f:
+            books = json.load(f)
+            for book in books:
+                create_book(book["title"], book["author"], book["genre"], conn)
+    conn.commit()
+
+def drop_tables(conn: sqlite3.Connection):
+    conn.execute("""
+        DROP TABLE IF EXISTS books
+    """)
+    conn.execute("""
+        DROP TABLE IF EXISTS users
+    """)
+    conn.execute("""
+        DROP TABLE IF EXISTS reading_list
+    """)
+    conn.commit()
+
 def create_book(title, author, genre, conn: sqlite3.Connection):
     conn.execute("""
         INSERT INTO books (title, author, genre)
@@ -61,10 +87,10 @@ def create_book(title, author, genre, conn: sqlite3.Connection):
     """, (title, author, genre))
     conn.commit()
 
-def get_books(conn: sqlite3.Connection):
+def get_books(start, n, conn: sqlite3.Connection):
     cursor = conn.execute("""
-        SELECT * FROM books
-    """)
+        SELECT * FROM books LIMIT ? OFFSET ?
+    """, (n, start))
     books = cursor.fetchall()
     return books
 
@@ -75,10 +101,19 @@ def get_book(book_id, conn: sqlite3.Connection):
     book = cursor.fetchone()
     return book
 
+def get_book_count(conn: sqlite3.Connection):
+    cursor = conn.execute("""
+        SELECT COUNT(*) FROM books
+    """)
+    count = cursor.fetchone()
+    return count[0]
+
 def search_book_by_title(title, conn: sqlite3.Connection):
     cursor = conn.execute("""
         SELECT * FROM books WHERE title LIKE ?
     """, (f"%{title}%",))
+    books = cursor.fetchall()
+    return books
 
 def update_book(book_id, title, author, genre, conn: sqlite3.Connection):
     conn.execute("""
@@ -156,12 +191,26 @@ def get_reading_lists(user_id, conn: sqlite3.Connection):
     reading_lists = cursor.fetchall()
     return reading_lists
 
+def get_completed_books(user_id, conn: sqlite3.Connection):
+    cursor = conn.execute("""
+        SELECT * FROM reading_list WHERE user = ? AND reading_status = 'complete'
+    """, (user_id,))
+    completed_books = cursor.fetchall()
+    return completed_books
+
 def get_readers(book_id, conn: sqlite3.Connection):
     cursor = conn.execute("""
         SELECT * FROM reading_list WHERE book = ?
     """, (book_id,))
     readers = cursor.fetchall()
     return readers
+
+def get_book_read_count(book_id, conn: sqlite3.Connection):
+    cursor = conn.execute("""
+        SELECT COUNT(*) FROM reading_list WHERE book = ? AND reading_status = 'complete'
+    """, (book_id,))
+    count = cursor.fetchone()
+    return count[0]
 
 def remove_from_reading_list(user_id, book_id, conn: sqlite3.Connection):
     conn.execute("""

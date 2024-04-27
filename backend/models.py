@@ -15,6 +15,11 @@ class Book(BaseModel):
     genre: str
     reads: int | None = None
 
+class Books(BaseModel):
+    books: list[Book]
+    previous_n: int = 0
+    next_n: int | None = None
+
 class CreateUser(BaseModel):
     username: str
     password: str

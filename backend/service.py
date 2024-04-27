@@ -61,19 +61,35 @@ class Book:
     def from_db(book_id):
         conn = sqlite3.connect(SQLITE_DB)
         book_data = database.get_book(book_id, conn)
-        conn.close()
         if book_data:
-            return models.Book(id = book_data[0], title = book_data[1], author = book_data[2], genre = book_data[3])
-        return None
+            book = models.Book(id = book_data[0], title = book_data[1], author = book_data[2], genre = book_data[3], reads=database.get_book_read_count(book_data[0], conn))
+            conn.close()
+            return book
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Book not found!")
+    
+    @staticmethod
+    def get_books(start: int, n: int):
+        conn = sqlite3.connect(SQLITE_DB)
+        book_data = database.get_books(start, n, conn)
+        books = [models.Book(id = book[0], title = book[1], author = book[2], genre = book[3], reads=database.get_book_read_count(book[0], conn)) for book in book_data]
+        count = database.get_book_count(conn)
+        conn.close()
+    
+        return models.Books(
+            books = books,
+            previous_n = prev_n if (prev_n := start - n) >= 0 else 0,
+            next_n = start_n if (start_n := start + n) < count else None
+        )
         
     @staticmethod
     def search_book(book_name):
         conn = sqlite3.connect(SQLITE_DB)
-        book_data = database.get_book_by_name(book_name, conn)
-        conn.close() 
+        book_data = database.search_book_by_title(book_name, conn)
         if not book_data:
+            conn.close()
             return []
-        books = [models.Book(id = book[0], title = book[1], author = book[2], genre = book[3]) for book in book_data]            
+        books = [models.Book(id = book[0], title = book[1], author = book[2], genre = book[3], reads=database.get_book_read_count(book[0], conn)) for book in book_data]
+        conn.close()            
         return books
        
 
@@ -98,7 +114,10 @@ class ReadingList:
 
     def read_books(self):
         # get the books that have been read
-        return [book for book in self.books if book.status == models.StatusEnum.complete]
+        conn = sqlite3.connect(SQLITE_DB)
+        books = database.get_completed_books(self.user_id, conn)
+        conn.close()
+        return books
 
     def remove_book(self, book_id):
         conn = sqlite3.connect(SQLITE_DB)
