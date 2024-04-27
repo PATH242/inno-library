@@ -94,6 +94,13 @@ def get_books(start, n, conn: sqlite3.Connection):
     books = cursor.fetchall()
     return books
 
+def get_genres(conn: sqlite3.Connection):
+    cursor = conn.execute("""
+        SELECT DISTINCT genre FROM books
+    """)
+    genres = cursor.fetchall()
+    return [genre[0] for genre in genres]
+
 def get_book(book_id, conn: sqlite3.Connection):
     cursor = conn.execute("""
         SELECT * FROM books WHERE id = ?
@@ -112,6 +119,13 @@ def search_book_by_title(title, conn: sqlite3.Connection):
     cursor = conn.execute("""
         SELECT * FROM books WHERE title LIKE ?
     """, (f"%{title}%",))
+    books = cursor.fetchall()
+    return books
+
+def get_books_by_genre(genre, conn: sqlite3.Connection):
+    cursor = conn.execute("""
+        SELECT * FROM books WHERE genre = ?
+    """, (genre,))
     books = cursor.fetchall()
     return books
 

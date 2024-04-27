@@ -32,6 +32,14 @@ def get_all_books(start: int = 0, n: int =15) -> models.Books:
 def search_book(q: str) -> list[models.Book]:
     return service.Book.search_book(q)
 
+@router.get("/genre", tags=["books"])
+def get_genres() -> list[str]:
+    return service.Book.get_genres()
+
+@router.get("/books/genre", tags=["books"])
+def get_books_by_genre(genre: str) -> list[models.Book]:
+    return service.Book.get_books_by_genre(genre)
+
 # Reading list routes
 @router.get("/reads", tags=["library"])
 def get_reading_list(user_id: int = Depends(security.get_user)) -> list[models.Book]:
@@ -55,3 +63,8 @@ def remove_from_reading_list(book_id: int, user_id: int = Depends(security.get_u
     reading_list = service.ReadingList(user_id)
     reading_list.remove_book(book_id)
     return "Book removed from reading list!"
+
+@router.get("/recommend", tags=["library"])
+def get_recommendations(n: int = 15, user_id: int = Depends(security.get_user)) -> list[models.Book]:
+    reading_list = service.ReadingList(user_id)
+    return reading_list.get_recommendations(n)

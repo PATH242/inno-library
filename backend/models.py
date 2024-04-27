@@ -35,7 +35,9 @@ class User(BaseModel):
     reads: int | None = None
     total_books: int | None = None
 
-class Token(User):
+class Token(BaseModel):
+    id: int
+    username: str
     token: str
 
 class EditReadingList(BaseModel):

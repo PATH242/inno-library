@@ -91,7 +91,22 @@ class Book:
         books = [models.Book(id = book[0], title = book[1], author = book[2], genre = book[3], reads=database.get_book_read_count(book[0], conn)) for book in book_data]
         conn.close()            
         return books
-       
+    
+    @staticmethod
+    def get_genres():
+        conn = sqlite3.connect(SQLITE_DB)
+        genres = database.get_genres(conn)
+        conn.close()
+        return genres
+    
+    @staticmethod
+    def get_books_by_genre(genre):
+        conn = sqlite3.connect(SQLITE_DB)
+        book_data = database.get_books_by_genre(genre, conn)
+        books = [models.Book(id = book[0], title = book[1], author = book[2], genre = book[3], reads=database.get_book_read_count(book[0], conn)) for book in book_data]
+        books.sort(key=lambda book: book.reads, reverse=True)
+        conn.close()
+        return books[:15]
 
 class ReadingList:
     def __init__(self, user_id):
@@ -128,3 +143,19 @@ class ReadingList:
         conn = sqlite3.connect(SQLITE_DB)
         database.update_reading_status(self.user_id, book_id, status, conn)
         conn.close()
+
+    def get_recommendations(self, n: int = 15):
+        conn = sqlite3.connect(SQLITE_DB)
+        # for each genre in the reading list, get the books in that genre
+        _books = []
+        for genre in self.get_genres():
+            _books.extend(database.get_books_by_genre(genre, conn))
+        
+        books = list(set(_books))
+        books = [Book.from_db(book[0]) for book in books]
+
+        # remove the books that are already in the reading list
+        books = [book for book in books if book not in self.books]
+        books.sort(key=lambda book: book.reads, reverse=True)
+        conn.close()
+        return books[:n]
