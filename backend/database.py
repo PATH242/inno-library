@@ -125,12 +125,12 @@ def get_user_by_username(username, conn: sqlite3.Connection):
     user = cursor.fetchone()
     return user
 
-def update_user(user_id, username, password_hash, name, conn: sqlite3.Connection):
+def update_user(user_id, username, password_hash, conn: sqlite3.Connection):
     conn.execute("""
         UPDATE users
-        SET username = ?, password_hash = ?, name = ?, updated_at = CURRENT_TIMESTAMP
+        SET username = ?, password_hash = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-    """, (username, password_hash, name, user_id))
+    """, (username, password_hash, user_id))
     conn.commit()
 
 def delete_user(user_id, conn: sqlite3.Connection):

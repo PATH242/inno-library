@@ -16,3 +16,5 @@ jobs:
           poetry-version: '1.7.1'
       - name: Install dependencies
         run: poetry install
+      - name: run tests
+        run: poetry run pytest
