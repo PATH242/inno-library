@@ -4,14 +4,14 @@ import sqlite3
 def create_tables(conn: sqlite3.Connection):
     # {
     #     "title": "Book name", 
-    #     "authors": "author",
+    #     "author": "author",
     #     "genre": "genre",
     # }
     conn.execute("""
         CREATE TABLE IF NOT EXISTS books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
-            authors TEXT NOT NULL,
+            author TEXT NOT NULL,
             genre TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -29,7 +29,6 @@ def create_tables(conn: sqlite3.Connection):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
             password_hash TEXT NOT NULL,
-            name TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -56,11 +55,11 @@ def create_tables(conn: sqlite3.Connection):
     """)
     conn.commit()
 
-def create_book(title, authors, genre, conn: sqlite3.Connection):
+def create_book(title, author, genre, conn: sqlite3.Connection):
     conn.execute("""
-        INSERT INTO books (title, authors, genre)
+        INSERT INTO books (title, author, genre)
         VALUES (?, ?, ?)
-    """, (title, authors, genre))
+    """, (title, author, genre))
     conn.commit()
 
 def get_books(conn: sqlite3.Connection):
@@ -77,12 +76,12 @@ def get_book(book_id, conn: sqlite3.Connection):
     book = cursor.fetchone()
     return book
 
-def update_book(book_id, title, authors, genre, conn: sqlite3.Connection):
+def update_book(book_id, title, author, genre, conn: sqlite3.Connection):
     conn.execute("""
         UPDATE books
-        SET title = ?, authors = ?, genre = ?, updated_at = CURRENT_TIMESTAMP
+        SET title = ?, author = ?, genre = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-    """, (title, authors, genre, book_id))
+    """, (title, author, genre, book_id))
     conn.commit()
 
 def delete_book(book_id, conn: sqlite3.Connection):
@@ -94,11 +93,11 @@ def delete_book(book_id, conn: sqlite3.Connection):
     """, (book_id,))
     conn.commit()
 
-def create_user(username, password_hash, name, conn: sqlite3.Connection):
+def create_user(username, password_hash, conn: sqlite3.Connection):
     conn.execute("""
-        INSERT INTO users (username, password_hash, name)
-        VALUES (?, ?, ?)
-    """, (username, password_hash, name))
+        INSERT INTO users (username, password_hash)
+        VALUES (?, ?)
+    """, (username, password_hash))
     conn.commit()
 
 def get_users(conn: sqlite3.Connection):

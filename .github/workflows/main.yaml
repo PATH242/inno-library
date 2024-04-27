@@ -15,4 +15,4 @@ jobs:
         with:
           poetry-version: '1.7.1'
       - name: Install dependencies
-        run: poetry install; poetry add fastapi uvicorn sqlalchemy supabase pytest pytest-mock pytest-cov
+        run: poetry install
