@@ -26,8 +26,22 @@ class TestDatabaseBookFunctions(unittest.TestCase):
         )
         self.conn.commit.assert_called_once()
 
+    def test_get_books(self):
+        books = db.get_books(0, 2, self.conn)
+        self.conn.execute.assert_called_with("""
+        SELECT * FROM books LIMIT ? OFFSET ?
+    """, (2, 0))
+        self.assertEqual(books, [(1, 'Sample Book', 'Author A', 'Genre A'), (2, 'Another Book', 'Author B', 'Genre B')])
+    
+    def test_get_genres(self):
+        self.cursor.fetchall.return_value = [('Fiction',), ('Non-Fiction',)]
+        genres = db.get_genres(self.conn)
+        self.conn.execute.assert_called_with("""
+        SELECT DISTINCT genre FROM books
+    """)
+        self.assertEqual(genres, ['Fiction', 'Non-Fiction'])
+
     def test_get_book(self):
-        # Test retrieving a single book by ID
         book_id = 1
         book = db.get_book(book_id, self.conn)
         self.conn.execute.assert_called_with("""
@@ -35,10 +49,28 @@ class TestDatabaseBookFunctions(unittest.TestCase):
     """, (book_id,))
         self.assertEqual(book, (1, 'Sample Book', 'Author A', 'Genre A'))
         
-    def test_get_books(self):
-        books = db.get_books(self.conn)
-        self.conn.execute.assert_called_with("\n        SELECT * FROM books\n    ")
-        self.assertEqual(books, [(1, 'Sample Book', 'Author A', 'Genre A'), (2, 'Another Book', 'Author B', 'Genre B')])
+    def test_get_book_count(self):
+        self.cursor.fetchone.return_value = (5,)
+        count = db.get_book_count(self.conn)
+        self.conn.execute.assert_called_with("""
+        SELECT COUNT(*) FROM books
+    """)
+        self.assertEqual(count, 5)
+    def test_search_book_by_title(self):
+        search_title = 'Sample'
+        searched_books = db.search_book_by_title(search_title, self.conn)
+        self.conn.execute.assert_called_with("""
+        SELECT * FROM books WHERE title LIKE ?
+    """, ("%Sample%",))
+        self.assertEqual(searched_books, [(1, 'Sample Book', 'Author A', 'Genre A'), (2, 'Another Book', 'Author B', 'Genre B')])
+
+    def test_get_books_by_genre(self):
+        genre = 'Fiction'
+        books_by_genre = db.get_books_by_genre(genre, self.conn)
+        self.conn.execute.assert_called_with("""
+        SELECT * FROM books WHERE genre = ?
+    """, (genre,))
+        self.assertEqual(books_by_genre, [(1, 'Sample Book', 'Author A', 'Genre A'), (2, 'Another Book', 'Author B', 'Genre B')])
 
     def test_update_book(self):
         db.update_book(1, 'Updated Book', 'Updated Author', 'Updated Genre', self.conn)
@@ -51,7 +83,6 @@ class TestDatabaseBookFunctions(unittest.TestCase):
         self.conn.commit.assert_called_once()
 
     def test_delete_book(self):
-        # Test deleting a book
         db.delete_book(1, self.conn)
         calls = [
             (("""
@@ -84,6 +115,13 @@ class TestDatabaseUserFunctions(unittest.TestCase):
     """, ('newuser', 'newhash'))
             self.conn.commit.assert_called_once()
 
+    def test_get_users(self):
+        users = db.get_users(self.conn)
+        self.conn.execute.assert_called_with("""
+        SELECT * FROM users
+    """)
+        self.assertEqual(users, [(1, 'user1', 'hash1'), (2, 'user2', 'hash2')])
+
     def test_get_user(self):
         user_id = 1
         user = db.get_user(user_id, self.conn)
@@ -91,13 +129,16 @@ class TestDatabaseUserFunctions(unittest.TestCase):
         SELECT * FROM users WHERE id = ?
     """, (user_id,))
         self.assertEqual(user, (1, 'user1', 'hash1'))
+    
+    def test_get_user_by_username(self):
+        username = 'user1'
+        user = db.get_user_by_username(username, self.conn)
         
-    def test_get_users(self):
-        users = db.get_users(self.conn)
         self.conn.execute.assert_called_with("""
-        SELECT * FROM users
-    """)
-        self.assertEqual(users, [(1, 'user1', 'hash1'), (2, 'user2', 'hash2')])
+        SELECT * FROM users WHERE username = ?
+    """, (username,))
+        
+        self.assertEqual(user, (1, 'user1', 'hash1'))
 
     def test_update_user(self):
         db.update_user(1, 'updateduser', 'updatedhash',  self.conn)
@@ -149,12 +190,32 @@ class TestDatabaseReadingListFunctions(unittest.TestCase):
     """, (1,))
         self.assertEqual(reading_lists, [(1, 1, 1, 'not_started'), (2, 1, 2, 'in_progress')])
 
+    def test_get_completed_books(self):
+        # Change the return value for this specific test
+        self.cursor.fetchall.return_value = [
+            (1, 1, 1, 'complete'),
+            (2, 1, 2, 'complete')
+        ]
+        completed_books = db.get_completed_books(1, self.conn)
+        self.conn.execute.assert_called_with("""
+        SELECT * FROM reading_list WHERE user = ? AND reading_status = 'complete'
+    """,  (1,))
+        self.assertEqual(completed_books, [(1, 1, 1, 'complete'), (2, 1, 2, 'complete')])
+
     def test_get_readers(self):
         readers = db.get_readers(1, self.conn)
         self.conn.execute.assert_called_with("""
         SELECT * FROM reading_list WHERE book = ?
     """, (1,))
         self.assertEqual(readers, [(1, 1, 1, 'not_started'), (2, 1, 2, 'in_progress')])
+
+    def test_get_book_read_count(self):
+        self.cursor.fetchone.return_value = (5,)
+        n = db.get_book_read_count(1, self.conn)
+        self.conn.execute.assert_called_with("""
+        SELECT COUNT(*) FROM reading_list WHERE book = ? AND reading_status = 'complete'
+    """,  (1,))
+        assert n == 5
 
     def test_remove_from_reading_list(self):
         db.remove_from_reading_list(1, 1, self.conn)
