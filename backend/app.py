@@ -1,9 +1,10 @@
+import sqlite3
+
 from fastapi import FastAPI
 from fastapi.middleware import cors
+
+from . import const, database
 from .router import router
-from . import database, const
-import os
-import sqlite3
 
 app = FastAPI()
 

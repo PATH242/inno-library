@@ -1,14 +1,15 @@
-import os
-from passlib.context import CryptContext
-from jose import jwt
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 
-from fastapi import Security, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from .models import User
-from .const import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from fastapi import HTTPException, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import jwt
+from jose.exceptions import ExpiredSignatureError, JWTError
+from passlib.context import CryptContext
+
+from .const import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 
 pwd_context = CryptContext(schemes=["bcrypt"])
+
 
 def create_jwt_token(data: dict) -> str:
     _ed = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -21,24 +22,35 @@ def create_jwt_token(data: dict) -> str:
 
     return token
 
+
 def get_user_from_token(token: str) -> int:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except jwt.ExpiredSignatureError:
+    except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.JWTError:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-    
+    except JWTError:
+        raise HTTPException(
+            status_code=401, detail="Invalid authentication credentials"
+        )
+
     user_id = payload.get("user_id")
-    
+
     if user_id is None:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        raise HTTPException(
+            status_code=401, detail="Invalid authentication credentials"
+        )
 
     return user_id
 
-def get_user(authorization: HTTPAuthorizationCredentials = Security(HTTPBearer())) -> int:
+
+def get_user(
+    authorization: HTTPAuthorizationCredentials = Security(HTTPBearer()),
+) -> int:
     if authorization.scheme.lower() != "bearer":
-        raise HTTPException(status_code=401, detail="Invalid authentication scheme")
-    
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid authentication scheme",
+        )
+
     token = authorization.credentials
     return get_user_from_token(token)
