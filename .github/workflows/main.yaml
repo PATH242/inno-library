@@ -18,3 +18,5 @@ jobs:
         run: poetry install
       - name: run tests
         run: poetry run pytest
+      - name: run tests with coverage check
+        run: poetry run pytest --cov=backend --cov-fail-under=60
