@@ -170,8 +170,17 @@ class ReadingList:
     def load(self):
         conn = sqlite3.connect(SQLITE_DB)
         self.books = [
-            Book.from_db(entry[1])
+            models.MyRead(
+                id=book.id,
+                title=book.title,
+                author=book.author,
+                genre=book.genre,
+                reads=book.reads,
+                status=entry[3],
+                updated_at=entry[5],
+            )
             for entry in database.get_reading_lists(self.user_id, conn)
+            if (book := Book.from_db(entry[1]))
         ]
         conn.close()
 

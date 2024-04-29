@@ -57,7 +57,7 @@ def get_books_by_genre(genre: str) -> list[models.Book]:
 @router.get("/reads", tags=["library"])
 def get_reading_list(
     user_id: int = Depends(security.get_user),
-) -> list[models.Book]:
+) -> list[models.MyRead]:
     reading_list = service.ReadingList(user_id)
     return reading_list.books
 

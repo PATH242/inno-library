@@ -53,8 +53,6 @@ class EditReadingList(BaseModel):
     status: StatusEnum | None = None
 
 
-class MyRead(BaseModel):
-    book_id: int
-    title: str
+class MyRead(Book):
     status: StatusEnum
     updated_at: datetime
