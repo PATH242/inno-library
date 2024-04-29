@@ -1,6 +1,11 @@
+"""
+This module contains the business logic for the application.
+"""
+
 import sqlite3
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException
+from fastapi import status as http_status
 from passlib.context import CryptContext
 
 from . import database, models
@@ -10,22 +15,42 @@ context = CryptContext(schemes=["bcrypt"])
 
 
 class Hasher:
+    """
+    Class for hashing and verifying passwords.
+    """
+
     @staticmethod
     def password_hash(password):
+        """
+        Hash a password using bcrypt.
+        Returns different hash each time for the same password.
+        """
         return context.hash(password)
 
     @staticmethod
     def password_verification(password, hashed_password):
+        """
+        Verify a password against a hashed password.
+        """
+
         return context.verify(password, hashed_password)
 
 
 class User:
+    """
+    Class for managing users
+    """
 
     @staticmethod
     def create_user(username, password, confirm_password):
+        """
+        Given user data, creates a user. Checks for the validity of
+        password and existing username before proceeding.
+        """
+
         if password != confirm_password:
             raise HTTPException(
-                status.HTTP_400_BAD_REQUEST,
+                http_status.HTTP_400_BAD_REQUEST,
                 "Password and confirmation don't match!",
             )
 
@@ -37,11 +62,16 @@ class User:
             conn.close()
         else:
             raise HTTPException(
-                status.HTTP_400_BAD_REQUEST, detail="Username already exists!"
+                http_status.HTTP_400_BAD_REQUEST, detail="Username already exists!"
             )
 
     @staticmethod
     def verify_new_user(username):
+        """
+        Helper function to check if a username exists in the database.
+        Return True if user exists, else False
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         users = database.get_user_by_username(username, conn)
         conn.close()
@@ -49,23 +79,31 @@ class User:
 
     @staticmethod
     def check_user(username, password):
+        """
+        Function to verify login.
+        Returns the ID of a user if the username and password matches.
+        Throws exception, in case of wrong password/
+        """
         conn = sqlite3.connect(SQLITE_DB)
         user = database.get_user_by_username(username, conn)
         conn.close()
         if not user:
             raise HTTPException(
-                status.HTTP_404_NOT_FOUND,
+                http_status.HTTP_404_NOT_FOUND,
                 detail="User not found!",
             )
         if not Hasher.password_verification(password, user[2]):
             raise HTTPException(
-                status.HTTP_404_NOT_FOUND,
-                detail="User not found!",
+                http_status.HTTP_404_NOT_FOUND,
+                detail="Credentials mismatch!",
             )
         return user
 
     @staticmethod
     def get_user(user_id):
+        """
+        Helper function to return a User instance given a user id
+        """
         conn = sqlite3.connect(SQLITE_DB)
         user = database.get_user(user_id, conn)
         conn.close()
@@ -73,8 +111,16 @@ class User:
 
 
 class Book:
+    """
+    Class related to Book related logic
+    """
+
     @staticmethod
     def from_db(book_id):
+        """
+        Given a book id, returns a Book class object
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         book_data = database.get_book(book_id, conn)
         if book_data:
@@ -88,12 +134,19 @@ class Book:
             conn.close()
             return book
         raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
+            http_status.HTTP_404_NOT_FOUND,
             detail="Book not found!",
         )
 
     @staticmethod
     def get_books(start: int, n: int):
+        """
+        Helper function to get a list of books (paginated).
+        Converts the database results to Book object.
+        Also calculates the previous and next offsets.
+        Returns a Books object.
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         book_data = database.get_books(start, n, conn)
         books = [
@@ -117,11 +170,16 @@ class Book:
 
     @staticmethod
     def search_book(book_name):
+        """
+        Search for a book by name.
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         book_data = database.search_book_by_title(book_name, conn)
         if not book_data:
             conn.close()
             return []
+
         books = [
             models.Book(
                 id=book[0],
@@ -137,6 +195,9 @@ class Book:
 
     @staticmethod
     def get_genres():
+        """
+        Helper function to get the list of genres.
+        """
         conn = sqlite3.connect(SQLITE_DB)
         genres = database.get_genres(conn)
         conn.close()
@@ -144,6 +205,10 @@ class Book:
 
     @staticmethod
     def get_books_by_genre(genre):
+        """
+        Helper function to get the list of books by genre.
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         book_data = database.get_books_by_genre(genre, conn)
         books = [
@@ -162,12 +227,25 @@ class Book:
 
 
 class ReadingList:
+    """
+    Class for managing the reading list of a user.
+    """
+
     def __init__(self, user_id):
+        """
+        Initialize the ReadingList object with the user id.
+        """
+
         self.user_id = user_id
         self.books = []
         self.load()
 
     def load(self):
+        """
+        Load's the user's library from the database.
+        Converts the database results to MyRead object.
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         self.books = [
             models.MyRead(
@@ -185,31 +263,62 @@ class ReadingList:
         conn.close()
 
     def get_genres(self):
+        """
+        Helper function to get the list of genres user has in the reading list.
+        """
         return list(set(book.genre for book in self.books if book))
 
     def add_book(self, book_id, status=models.StatusEnum.not_started):
+        """
+        Add a book to the reading list.
+        Checks if the book is already in the reading list and throws an error.
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
+        if database.get_book_in_reading_list(self.user_id, book_id, conn):
+            conn.close()
+            raise HTTPException(
+                http_status.HTTP_400_BAD_REQUEST,
+                detail="Book already in reading list!",
+            )
         database.create_reading_list(self.user_id, book_id, status, conn)
         conn.close()
 
     def read_books(self):
-        # get the books that have been read
+        """
+        Get the books that have been marked complete by the user.
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         books = database.get_completed_books(self.user_id, conn)
         conn.close()
         return books
 
     def remove_book(self, book_id):
+        """
+        Remove a book from the reading list.
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         database.remove_from_reading_list(self.user_id, book_id, conn)
         conn.close()
 
     def change_reading_status(self, book_id, status):
+        """
+        Change the reading status of a book in the reading list.
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         database.update_reading_status(self.user_id, book_id, status, conn)
         conn.close()
 
     def get_recommendations(self, n: int = 15):
+        """
+        Get book recommendations for the user based on the current reading list.
+        Returns empty list if the reading list is empty.
+        Returns top n books (sorted by number of reads) that are not in the reading list.
+        """
+
         conn = sqlite3.connect(SQLITE_DB)
         # for each genre in the reading list, get the books in that genre
         _books = []

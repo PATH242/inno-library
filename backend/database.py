@@ -1,9 +1,17 @@
+"""
+This module contains the SQL queries and related functions for the application.
+"""
+
 import json
 import os
 import sqlite3
 
 
 def create_tables(conn: sqlite3.Connection):
+    """
+    Crates the tables in the database and populates the books table with
+    the data from the books.json file.
+    """
     # {
     #     "title": "Book name",
     #     "author": "author",
@@ -63,7 +71,8 @@ def create_tables(conn: sqlite3.Connection):
     )
     conn.commit()
 
-    # check if there is any book in the database
+    # Check if there is any book exists in the database
+    # Populates the table only if there are no books in the database
     cursor = conn.execute(
         """
         SELECT * FROM books
@@ -79,6 +88,9 @@ def create_tables(conn: sqlite3.Connection):
 
 
 def drop_tables(conn: sqlite3.Connection):
+    """
+    Drops the tables from the database. Not used in the application.
+    """
     conn.execute(
         """
         DROP TABLE IF EXISTS books
@@ -98,6 +110,9 @@ def drop_tables(conn: sqlite3.Connection):
 
 
 def create_book(title, author, genre, conn: sqlite3.Connection):
+    """
+    Creates a new book in the database.
+    """
     conn.execute(
         """
         INSERT INTO books (title, author, genre)
@@ -109,6 +124,10 @@ def create_book(title, author, genre, conn: sqlite3.Connection):
 
 
 def get_books(start, n, conn: sqlite3.Connection):
+    """
+    Given an offset and a limit, returns a list of books.
+    """
+
     cursor = conn.execute(
         """
         SELECT * FROM books LIMIT ? OFFSET ?
@@ -120,6 +139,10 @@ def get_books(start, n, conn: sqlite3.Connection):
 
 
 def get_genres(conn: sqlite3.Connection):
+    """
+    Returns the list of all genres in the database.
+    """
+
     cursor = conn.execute(
         """
         SELECT DISTINCT genre FROM books
@@ -130,6 +153,10 @@ def get_genres(conn: sqlite3.Connection):
 
 
 def get_book(book_id, conn: sqlite3.Connection):
+    """
+    Returns the book with the given ID.
+    """
+
     cursor = conn.execute(
         """
         SELECT * FROM books WHERE id = ?
@@ -141,6 +168,9 @@ def get_book(book_id, conn: sqlite3.Connection):
 
 
 def get_book_count(conn: sqlite3.Connection):
+    """
+    Returns the total number of books in the database.
+    """
     cursor = conn.execute(
         """
         SELECT COUNT(*) FROM books
@@ -151,6 +181,9 @@ def get_book_count(conn: sqlite3.Connection):
 
 
 def search_book_by_title(title, conn: sqlite3.Connection):
+    """
+    Given a title, returns a list of books that contain the title (case insensitive).
+    """
     cursor = conn.execute(
         """
         SELECT * FROM books WHERE title LIKE ?
@@ -162,6 +195,9 @@ def search_book_by_title(title, conn: sqlite3.Connection):
 
 
 def get_books_by_genre(genre, conn: sqlite3.Connection):
+    """
+    Given a genre, returns a list of books that belong to the genre.
+    """
     cursor = conn.execute(
         """
         SELECT * FROM books WHERE genre = ?
@@ -173,6 +209,10 @@ def get_books_by_genre(genre, conn: sqlite3.Connection):
 
 
 def update_book(book_id, title, author, genre, conn: sqlite3.Connection):
+    """
+    Updates the book with the given ID. Not used in the application.
+    """
+
     conn.execute(
         """
         UPDATE books
@@ -185,6 +225,10 @@ def update_book(book_id, title, author, genre, conn: sqlite3.Connection):
 
 
 def delete_book(book_id, conn: sqlite3.Connection):
+    """
+    Deletes the book with the given ID. Not used in the application.
+    """
+
     conn.execute(
         """
         DELETE FROM books WHERE id = ?
@@ -201,6 +245,10 @@ def delete_book(book_id, conn: sqlite3.Connection):
 
 
 def create_user(username, password_hash, conn: sqlite3.Connection):
+    """
+    Creates a new user in the database.
+    """
+
     conn.execute(
         """
         INSERT INTO users (username, password_hash)
@@ -212,6 +260,10 @@ def create_user(username, password_hash, conn: sqlite3.Connection):
 
 
 def get_users(conn: sqlite3.Connection):
+    """
+    Returns the list of all users in the database. Not used in the application.
+    """
+
     cursor = conn.execute(
         """
         SELECT * FROM users
@@ -222,6 +274,10 @@ def get_users(conn: sqlite3.Connection):
 
 
 def get_user(user_id, conn: sqlite3.Connection):
+    """
+    Returns the user with the given ID.
+    """
+
     cursor = conn.execute(
         """
         SELECT * FROM users WHERE id = ?
@@ -233,6 +289,10 @@ def get_user(user_id, conn: sqlite3.Connection):
 
 
 def get_user_by_username(username, conn: sqlite3.Connection):
+    """
+    Returns the user with the given username.
+    """
+
     cursor = conn.execute(
         """
         SELECT * FROM users WHERE username = ?
@@ -244,6 +304,10 @@ def get_user_by_username(username, conn: sqlite3.Connection):
 
 
 def update_user(user_id, username, password_hash, conn: sqlite3.Connection):
+    """
+    Updates the user with the given ID. Not used in the application.
+    """
+
     conn.execute(
         """
         UPDATE users
@@ -256,6 +320,10 @@ def update_user(user_id, username, password_hash, conn: sqlite3.Connection):
 
 
 def delete_user(user_id, conn: sqlite3.Connection):
+    """
+    Deletes the user with the given ID. Not used in the application.
+    """
+
     conn.execute(
         """
         DELETE FROM users WHERE id = ?
@@ -277,6 +345,10 @@ def create_reading_list(
     reading_status,
     conn: sqlite3.Connection,
 ):
+    """
+    Given a user_id and a book_id, adds the book to user's library.
+    """
+
     conn.execute(
         """
         INSERT INTO reading_list (book, user, reading_status)
@@ -288,6 +360,10 @@ def create_reading_list(
 
 
 def get_reading_lists(user_id, conn: sqlite3.Connection):
+    """
+    Given a user_id, returns the list of books in the user's library.
+    """
+
     cursor = conn.execute(
         """
         SELECT * FROM reading_list WHERE user = ?
@@ -298,7 +374,26 @@ def get_reading_lists(user_id, conn: sqlite3.Connection):
     return reading_lists
 
 
+def get_book_in_reading_list(user_id, book_id, conn: sqlite3.Connection):
+    """
+    Given a user_id and a book_id, returns the book in user's library.
+    """
+
+    cursor = conn.execute(
+        """
+        SELECT * FROM reading_list WHERE user = ? AND book = ?
+    """,
+        (user_id, book_id),
+    )
+    book = cursor.fetchone()
+    return book
+
+
 def get_completed_books(user_id, conn: sqlite3.Connection):
+    """
+    Given a user_id, returns the list of books that the user has completed.
+    """
+
     cursor = conn.execute(
         """
         SELECT * FROM reading_list WHERE user = ?
@@ -311,6 +406,10 @@ def get_completed_books(user_id, conn: sqlite3.Connection):
 
 
 def get_readers(book_id, conn: sqlite3.Connection):
+    """
+    Given a book_id, returns the list of users who have added the book to their library.
+    """
+
     cursor = conn.execute(
         """
         SELECT * FROM reading_list WHERE book = ?
@@ -322,6 +421,10 @@ def get_readers(book_id, conn: sqlite3.Connection):
 
 
 def get_book_read_count(book_id, conn: sqlite3.Connection):
+    """
+    Given a book_id, returns the number of users who have completed the book.
+    """
+
     cursor = conn.execute(
         """
         SELECT COUNT(*) FROM reading_list WHERE book = ?
@@ -334,6 +437,10 @@ def get_book_read_count(book_id, conn: sqlite3.Connection):
 
 
 def remove_from_reading_list(user_id, book_id, conn: sqlite3.Connection):
+    """
+    Given a user_id and a book_id, removes the book from user's library.
+    """
+
     conn.execute(
         """
         DELETE FROM reading_list WHERE book = ? AND user = ?
@@ -349,6 +456,11 @@ def update_reading_status(
     reading_status,
     conn: sqlite3.Connection,
 ):
+    """
+    Given a user_id, a book_id, and a reading_status, updates the reading status
+    of the book in user's library.
+    """
+
     conn.execute(
         """
         UPDATE reading_list

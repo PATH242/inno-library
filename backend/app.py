@@ -14,6 +14,7 @@ conn.close()
 
 app.include_router(router)
 
+# Add middlewares against CORS issue
 app.add_middleware(
     cors.CORSMiddleware,
     allow_origins=["*"],
@@ -24,5 +25,8 @@ app.add_middleware(
 
 
 @app.get("/")
-async def healthcheck():
+async def healthcheck() -> dict[str, str]:
+    """
+    Healtcheck route. Returns `{"status": "ok"}` if the server is running.
+    """
     return {"status": "ok"}

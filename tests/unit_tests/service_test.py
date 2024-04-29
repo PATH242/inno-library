@@ -314,14 +314,22 @@ class TestReadingList(unittest.TestCase):
 
     @patch("sqlite3.connect")
     @patch("backend.database.create_reading_list")
-    def test_add_book(self, mock_create_reading_list, mock_connect):
+    @patch("backend.database.get_book_in_reading_list")
+    def test_add_book(
+        self,
+        mock_get_book_in_reading_list,
+        mock_create_reading_list,
+        mock_connect,
+    ):
         mock_conn = MagicMock()
         mock_conn.close = MagicMock()
         mock_connect.return_value = mock_conn
+        mock_get_book_in_reading_list.return_value = ()
 
         reading_list = service.ReadingList(user_id=1)
         mock_conn.close.assert_called_once()
         reading_list.add_book(book_id=101, status=models.StatusEnum.not_started)
+        mock_get_book_in_reading_list.assert_called_once_with(1, 101, mock_conn)
         mock_create_reading_list.assert_called_once_with(
             1, 101, models.StatusEnum.not_started, mock_conn
         )
