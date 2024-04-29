@@ -24,3 +24,12 @@ jobs:
         run: poetry run bandit -r backend/
       - name: run static analysis
         run: poetry run flake8 --max-complexity=10 backend/
+      - name: run complexity check with radon
+        run:  |
+          average=$(poetry run radon cc backend/ -a | tail -n 1 | awk '{print $NF}')
+          if (( $(echo "$average < 10" | bc -l) )); then
+              echo "Average complexity is acceptable: $average"
+          else
+              echo "Average complexity is too high: $average"
+              exit 1
+          fi
