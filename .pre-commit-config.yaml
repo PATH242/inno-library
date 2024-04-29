@@ -19,7 +19,7 @@ repos:
         types: [python]
       - id: mypy
         name: mypy
-        entry: poetry run mypy backend
+        entry: poetry run mypy
         always_run: false
         language: system
         types: [python]

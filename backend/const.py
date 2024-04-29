@@ -2,7 +2,9 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv()
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
+load_dotenv(os.path.join(BASEDIR, ".env"))
 
 SQLITE_DB = os.environ.get("SQLITE_DB", "db.sqlite3")
 
