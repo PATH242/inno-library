@@ -6,15 +6,23 @@ Web-based application allowing users to add books to their library, see recommen
 
 - [Online book library](#online-book-library)
   - [Table of contents](#table-of-contents)
+  - [Features](#features)
   - [Technologies](#technologies)
   - [Setup](#setup)
   - [Development](#development)
+
+## Features
+
+- Search for books
+- Add books to personal library
+- Track reading progress
+- See recommended books based on personal library
 
 ## Technologies
 
 - Backend: FastAPI
 - Database: SQLite
-- Frontend: Streamlit
+- Frontend: React + Typescript
 - Package manager: Poetry
 
 ## Setup
@@ -58,6 +66,7 @@ poetry run uvicorn backend.app:app --reload
 ```
 
 6. Run Performance testing with locust
+
 ```bash
 cd tests/performance && locust --users=5 --spawn-rate=3 --run-time=500s
 ```
