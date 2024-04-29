@@ -3,6 +3,7 @@ This module contains the SQL queries and related functions for the application.
 """
 
 import json
+import logging
 import os
 import sqlite3
 
@@ -12,6 +13,9 @@ def create_tables(conn: sqlite3.Connection):
     Crates the tables in the database and populates the books table with
     the data from the books.json file.
     """
+
+    logging.info("Creating tables")
+
     # {
     #     "title": "Book name",
     #     "author": "author",
@@ -85,12 +89,14 @@ def create_tables(conn: sqlite3.Connection):
             for book in books:
                 create_book(book["title"], book["author"], book["genre"], conn)
     conn.commit()
+    logging.info("Tables created")
 
 
 def drop_tables(conn: sqlite3.Connection):
     """
     Drops the tables from the database. Not used in the application.
     """
+    logging.info("Dropping tables")
     conn.execute(
         """
         DROP TABLE IF EXISTS books
@@ -107,12 +113,15 @@ def drop_tables(conn: sqlite3.Connection):
     """
     )
     conn.commit()
+    logging.info("Tables dropped")
 
 
 def create_book(title, author, genre, conn: sqlite3.Connection):
     """
     Creates a new book in the database.
     """
+    logging.info(f"Database: Creating book: {title}")
+
     conn.execute(
         """
         INSERT INTO books (title, author, genre)
@@ -121,12 +130,14 @@ def create_book(title, author, genre, conn: sqlite3.Connection):
         (title, author, genre),
     )
     conn.commit()
+    logging.info(f"Database: Book created: {title}")
 
 
 def get_books(start, n, conn: sqlite3.Connection):
     """
     Given an offset and a limit, returns a list of books.
     """
+    logging.info(f"Database: Getting books: {start} - {n}")
 
     cursor = conn.execute(
         """
@@ -135,6 +146,7 @@ def get_books(start, n, conn: sqlite3.Connection):
         (n, start),
     )
     books = cursor.fetchall()
+    logging.info(f"Database: {len(books)} books found")
     return books
 
 
@@ -142,6 +154,7 @@ def get_genres(conn: sqlite3.Connection):
     """
     Returns the list of all genres in the database.
     """
+    logging.info("Getting genres")
 
     cursor = conn.execute(
         """
@@ -149,6 +162,7 @@ def get_genres(conn: sqlite3.Connection):
     """
     )
     genres = cursor.fetchall()
+    logging.info(f"Database: {len(genres)} genres found")
     return [genre[0] for genre in genres]
 
 
@@ -156,6 +170,7 @@ def get_book(book_id, conn: sqlite3.Connection):
     """
     Returns the book with the given ID.
     """
+    logging.info(f"Database: Getting book: {book_id}")
 
     cursor = conn.execute(
         """
@@ -164,6 +179,7 @@ def get_book(book_id, conn: sqlite3.Connection):
         (book_id,),
     )
     book = cursor.fetchone()
+    logging.info(f"Database: Book found: {book[1]}")
     return book
 
 
@@ -171,12 +187,14 @@ def get_book_count(conn: sqlite3.Connection):
     """
     Returns the total number of books in the database.
     """
+    logging.info("Getting book count")
     cursor = conn.execute(
         """
         SELECT COUNT(*) FROM books
     """
     )
     count = cursor.fetchone()
+    logging.info(f"Database: {count[0]} books found")
     return count[0]
 
 
@@ -184,6 +202,7 @@ def search_book_by_title(title, conn: sqlite3.Connection):
     """
     Given a title, returns a list of books that contain the title (case insensitive).
     """
+    logging.info(f"Database: Searching book: {title}")
     cursor = conn.execute(
         """
         SELECT * FROM books WHERE title LIKE ?
@@ -191,6 +210,7 @@ def search_book_by_title(title, conn: sqlite3.Connection):
         (f"%{title}%",),
     )
     books = cursor.fetchall()
+    logging.info(f"Database: {len(books)} books found")
     return books
 
 
@@ -198,6 +218,7 @@ def get_books_by_genre(genre, conn: sqlite3.Connection):
     """
     Given a genre, returns a list of books that belong to the genre.
     """
+    logging.info(f"Database: Getting books by genre: {genre}")
     cursor = conn.execute(
         """
         SELECT * FROM books WHERE genre = ?
@@ -205,6 +226,7 @@ def get_books_by_genre(genre, conn: sqlite3.Connection):
         (genre,),
     )
     books = cursor.fetchall()
+    logging.info(f"Database: {len(books)} books found")
     return books
 
 
@@ -212,6 +234,7 @@ def update_book(book_id, title, author, genre, conn: sqlite3.Connection):
     """
     Updates the book with the given ID. Not used in the application.
     """
+    logging.info(f"Database: Updating book: {book_id}")
 
     conn.execute(
         """
@@ -222,12 +245,14 @@ def update_book(book_id, title, author, genre, conn: sqlite3.Connection):
         (title, author, genre, book_id),
     )
     conn.commit()
+    logging.info(f"Database: Book updated: {title}")
 
 
 def delete_book(book_id, conn: sqlite3.Connection):
     """
     Deletes the book with the given ID. Not used in the application.
     """
+    logging.info(f"Database: Deleting book: {book_id}")
 
     conn.execute(
         """
@@ -242,12 +267,14 @@ def delete_book(book_id, conn: sqlite3.Connection):
         (book_id,),
     )
     conn.commit()
+    logging.info(f"Database: Book deleted: {book_id}")
 
 
 def create_user(username, password_hash, conn: sqlite3.Connection):
     """
     Creates a new user in the database.
     """
+    logging.info(f"Database: Creating user: {username}")
 
     conn.execute(
         """
@@ -257,12 +284,14 @@ def create_user(username, password_hash, conn: sqlite3.Connection):
         (username, password_hash),
     )
     conn.commit()
+    logging.info(f"Database: User created: {username}")
 
 
 def get_users(conn: sqlite3.Connection):
     """
     Returns the list of all users in the database. Not used in the application.
     """
+    logging.info("Getting users")
 
     cursor = conn.execute(
         """
@@ -270,6 +299,7 @@ def get_users(conn: sqlite3.Connection):
     """
     )
     users = cursor.fetchall()
+    logging.info(f"Database: {len(users)} users found")
     return users
 
 
@@ -277,6 +307,7 @@ def get_user(user_id, conn: sqlite3.Connection):
     """
     Returns the user with the given ID.
     """
+    logging.info(f"Database: Getting user: {user_id}")
 
     cursor = conn.execute(
         """
@@ -285,6 +316,8 @@ def get_user(user_id, conn: sqlite3.Connection):
         (user_id,),
     )
     user = cursor.fetchone()
+    if user:
+        logging.info(f"Database: User found: {user[1]}")
     return user
 
 
@@ -292,6 +325,7 @@ def get_user_by_username(username, conn: sqlite3.Connection):
     """
     Returns the user with the given username.
     """
+    logging.info(f"Database: Getting user: {username}")
 
     cursor = conn.execute(
         """
@@ -300,6 +334,8 @@ def get_user_by_username(username, conn: sqlite3.Connection):
         (username,),
     )
     user = cursor.fetchone()
+    if user:
+        logging.info(f"Database: User found: {user[1]}")
     return user
 
 
@@ -307,6 +343,7 @@ def update_user(user_id, username, password_hash, conn: sqlite3.Connection):
     """
     Updates the user with the given ID. Not used in the application.
     """
+    logging.info(f"Database: Updating user: {user_id}")
 
     conn.execute(
         """
@@ -317,12 +354,14 @@ def update_user(user_id, username, password_hash, conn: sqlite3.Connection):
         (username, password_hash, user_id),
     )
     conn.commit()
+    logging.info(f"Database: User updated: {username}")
 
 
 def delete_user(user_id, conn: sqlite3.Connection):
     """
     Deletes the user with the given ID. Not used in the application.
     """
+    logging.info(f"Database: Deleting user: {user_id}")
 
     conn.execute(
         """
@@ -337,6 +376,7 @@ def delete_user(user_id, conn: sqlite3.Connection):
         (user_id,),
     )
     conn.commit()
+    logging.info(f"Database: User deleted: {user_id}")
 
 
 def create_reading_list(
@@ -348,6 +388,9 @@ def create_reading_list(
     """
     Given a user_id and a book_id, adds the book to user's library.
     """
+    logging.info(
+        f"Database: Adding book to reading list: {book_id} for user: {user_id}"
+    )
 
     conn.execute(
         """
@@ -357,12 +400,14 @@ def create_reading_list(
         (book_id, user_id, reading_status),
     )
     conn.commit()
+    logging.info(f"Database: Book added to reading list: {book_id} for user: {user_id}")
 
 
 def get_reading_lists(user_id, conn: sqlite3.Connection):
     """
     Given a user_id, returns the list of books in the user's library.
     """
+    logging.info(f"Database: Getting reading list for user: {user_id}")
 
     cursor = conn.execute(
         """
@@ -371,6 +416,7 @@ def get_reading_lists(user_id, conn: sqlite3.Connection):
         (user_id,),
     )
     reading_lists = cursor.fetchall()
+    logging.info(f"Database: {len(reading_lists)} books found")
     return reading_lists
 
 
@@ -378,6 +424,9 @@ def get_book_in_reading_list(user_id, book_id, conn: sqlite3.Connection):
     """
     Given a user_id and a book_id, returns the book in user's library.
     """
+    logging.info(
+        f"Database: Getting book: {book_id} in reading list for user: {user_id}"
+    )
 
     cursor = conn.execute(
         """
@@ -386,6 +435,8 @@ def get_book_in_reading_list(user_id, book_id, conn: sqlite3.Connection):
         (user_id, book_id),
     )
     book = cursor.fetchone()
+    if book:
+        logging.info(f"Database: Book found: {book[1]}")
     return book
 
 
@@ -393,6 +444,7 @@ def get_completed_books(user_id, conn: sqlite3.Connection):
     """
     Given a user_id, returns the list of books that the user has completed.
     """
+    logging.info(f"Database: Getting completed books for user: {user_id}")
 
     cursor = conn.execute(
         """
@@ -402,6 +454,7 @@ def get_completed_books(user_id, conn: sqlite3.Connection):
         (user_id,),
     )
     completed_books = cursor.fetchall()
+    logging.info(f"Database: {len(completed_books)} books found")
     return completed_books
 
 
@@ -409,6 +462,7 @@ def get_readers(book_id, conn: sqlite3.Connection):
     """
     Given a book_id, returns the list of users who have added the book to their library.
     """
+    logging.info(f"Database: Getting readers for book: {book_id}")
 
     cursor = conn.execute(
         """
@@ -417,6 +471,7 @@ def get_readers(book_id, conn: sqlite3.Connection):
         (book_id,),
     )
     readers = cursor.fetchall()
+    logging.info(f"Database: {len(readers)} readers found")
     return readers
 
 
@@ -424,6 +479,7 @@ def get_book_read_count(book_id, conn: sqlite3.Connection):
     """
     Given a book_id, returns the number of users who have completed the book.
     """
+    logging.info(f"Database: Getting read count for book: {book_id}")
 
     cursor = conn.execute(
         """
@@ -433,6 +489,7 @@ def get_book_read_count(book_id, conn: sqlite3.Connection):
         (book_id,),
     )
     count = cursor.fetchone()
+    logging.info(f"Database: {count[0]} readers found")
     return count[0]
 
 
@@ -440,6 +497,9 @@ def remove_from_reading_list(user_id, book_id, conn: sqlite3.Connection):
     """
     Given a user_id and a book_id, removes the book from user's library.
     """
+    logging.info(
+        f"Database: Removing book: {book_id} from reading list for user: {user_id}"
+    )
 
     conn.execute(
         """
@@ -448,6 +508,9 @@ def remove_from_reading_list(user_id, book_id, conn: sqlite3.Connection):
         (book_id, user_id),
     )
     conn.commit()
+    logging.info(
+        f"Database: Book removed: {book_id} from reading list for user: {user_id}"
+    )
 
 
 def update_reading_status(
@@ -460,6 +523,10 @@ def update_reading_status(
     Given a user_id, a book_id, and a reading_status, updates the reading status
     of the book in user's library.
     """
+    logging.info(
+        f"Database: Updating reading status: {reading_status} for book:"
+        f"{book_id} in reading list for user: {user_id}"
+    )
 
     conn.execute(
         """
@@ -470,3 +537,7 @@ def update_reading_status(
         (reading_status, book_id, user_id),
     )
     conn.commit()
+    logging.info(
+        f"Database: Reading status updated: {reading_status} for book:"
+        f"{book_id} in reading list for user: {user_id}"
+    )

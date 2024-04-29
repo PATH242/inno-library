@@ -2,6 +2,7 @@
 This module contains the business logic for the application.
 """
 
+import logging
 import sqlite3
 
 from fastapi import HTTPException
@@ -57,10 +58,12 @@ class User:
         password_hash = Hasher.password_hash(password)
 
         if not User.verify_new_user(username):
+            logging.info(f"Service: Creating user: {username}")
             conn = sqlite3.connect(SQLITE_DB)
             database.create_user(username, password_hash, conn)
             conn.close()
         else:
+            logging.error(f"Service: Username already exists: {username}")
             raise HTTPException(
                 http_status.HTTP_400_BAD_REQUEST, detail="Username already exists!"
             )
@@ -88,15 +91,18 @@ class User:
         user = database.get_user_by_username(username, conn)
         conn.close()
         if not user:
+            logging.error(f"Service: User not found: {username}")
             raise HTTPException(
                 http_status.HTTP_404_NOT_FOUND,
                 detail="User not found!",
             )
         if not Hasher.password_verification(password, user[2]):
+            logging.error(f"Service: Credentials mismatch for {username}")
             raise HTTPException(
                 http_status.HTTP_404_NOT_FOUND,
                 detail="Credentials mismatch!",
             )
+        logging.info(f"Service: User logged in: {username}")
         return user
 
     @staticmethod
@@ -175,8 +181,10 @@ class Book:
         """
 
         conn = sqlite3.connect(SQLITE_DB)
+        logging.info(f"Service: Searching for book: {book_name}")
         book_data = database.search_book_by_title(book_name, conn)
         if not book_data:
+            logging.error(f"Service: Book not found: {book_name}")
             conn.close()
             return []
 
@@ -190,6 +198,7 @@ class Book:
             )
             for book in book_data
         ]
+        logging.info(f"Service: {len(books)} books found for: {book_name}")
         conn.close()
         return books
 
@@ -222,6 +231,7 @@ class Book:
             for book in book_data
         ]
         books.sort(key=lambda book: book.reads, reverse=True)
+        logging.info(f"Service: {len(books)} books found for genre: {genre}")
         conn.close()
         return books[:15]
 
@@ -260,6 +270,10 @@ class ReadingList:
             for entry in database.get_reading_lists(self.user_id, conn)
             if (book := Book.from_db(entry[1]))
         ]
+        logging.info(
+            f"Service: Reading list loaded for user: {self.user_id}."
+            f"Total books: {len(self.books)}"
+        )
         conn.close()
 
     def get_genres(self):
@@ -276,12 +290,18 @@ class ReadingList:
 
         conn = sqlite3.connect(SQLITE_DB)
         if database.get_book_in_reading_list(self.user_id, book_id, conn):
+            logging.error(
+                f"Service: Book {book_id} already in reading list for user: {self.user_id}"
+            )
             conn.close()
             raise HTTPException(
                 http_status.HTTP_400_BAD_REQUEST,
                 detail="Book already in reading list!",
             )
         database.create_reading_list(self.user_id, book_id, status, conn)
+        logging.info(
+            f"Service: Book {book_id} added to reading list for user: {self.user_id}"
+        )
         conn.close()
 
     def read_books(self):
@@ -301,6 +321,9 @@ class ReadingList:
 
         conn = sqlite3.connect(SQLITE_DB)
         database.remove_from_reading_list(self.user_id, book_id, conn)
+        logging.info(
+            f"Service: Book {book_id} removed from reading list for user: {self.user_id}"
+        )
         conn.close()
 
     def change_reading_status(self, book_id, status):
@@ -310,6 +333,9 @@ class ReadingList:
 
         conn = sqlite3.connect(SQLITE_DB)
         database.update_reading_status(self.user_id, book_id, status, conn)
+        logging.info(
+            f"Service: Book {book_id} status updated to {status} for user: {self.user_id}"
+        )
         conn.close()
 
     def get_recommendations(self, n: int = 15):
@@ -330,6 +356,10 @@ class ReadingList:
 
         # remove the books that are already in the reading list
         books = [book for book in books if book not in self.books]
+        logging.info(
+            f"Service: Recommendations generated for user: {self.user_id}. "
+            f"Total books: {len(books)}"
+        )
         books.sort(key=lambda book: book.reads, reverse=True)
         conn.close()
         return books[:n]
