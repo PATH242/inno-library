@@ -20,5 +20,7 @@ jobs:
         run: poetry run pytest
       - name: run tests with coverage check
         run: poetry run pytest --cov=backend --cov-fail-under=60
-      - name: run bandit check
+      - name: run security check
         run: poetry run bandit -r backend/
+      - name: run static analysis
+        run: poetry run flake8 --max-complexity=10 backend/
