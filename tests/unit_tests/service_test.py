@@ -271,3 +271,128 @@ class TestBook(unittest.TestCase):
         calls = [((book_id, mock_conn),) for book_id in [1, 2, 3]]
         mock_get_book_read_count.assert_has_calls(calls, any_order=True)
         mock_conn.close.assert_called_once()
+
+
+class TestReadingList(unittest.TestCase):
+    @patch('sqlite3.connect')
+    @patch('backend.service.Book.from_db')
+    @patch('backend.database.get_reading_lists')
+    def test_init_and_load(self, mock_get_reading_lists,
+                           mock_from_db, mock_connect):
+        mock_conn = MagicMock()
+        mock_conn.close = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_get_reading_lists.return_value = [(1, 101), (1, 102)]
+        mock_from_db.side_effect = lambda book_id: MagicMock(id=book_id)
+
+        reading_list = service.ReadingList(user_id=1)
+        self.assertEqual(len(reading_list.books), 2)
+        mock_get_reading_lists.assert_called_once_with(1, mock_conn)
+        mock_from_db.assert_has_calls(
+            [unittest.mock.call(101), unittest.mock.call(102)])
+        mock_conn.close.assert_called_once()
+
+    @patch('sqlite3.connect')
+    @patch('backend.database.create_reading_list')
+    def test_add_book(self, mock_create_reading_list, mock_connect):
+        mock_conn = MagicMock()
+        mock_conn.close = MagicMock()
+        mock_connect.return_value = mock_conn
+
+        reading_list = service.ReadingList(user_id=1)
+        mock_conn.close.assert_called_once()
+        reading_list.add_book(book_id=101,
+                              status=models.StatusEnum.not_started)
+        mock_create_reading_list.assert_called_once_with(
+            1, 101, models.StatusEnum.not_started, mock_conn)
+        mock_conn.close.assert_has_calls(([], []))
+
+    @patch('sqlite3.connect')
+    @patch('backend.database.get_completed_books')
+    def test_read_books(self, mock_get_completed_books, mock_connect):
+        mock_conn = MagicMock()
+        mock_conn.close = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_get_completed_books.return_value = ['Book 101', 'Book 102']
+
+        reading_list = service.ReadingList(user_id=1)
+        mock_conn.close.assert_called_once()
+        books = reading_list.read_books()
+        self.assertEqual(books, ['Book 101', 'Book 102'])
+        mock_get_completed_books.assert_called_once_with(1, mock_conn)
+        mock_conn.close.assert_has_calls(([], []))
+
+    @patch('sqlite3.connect')
+    @patch('backend.database.remove_from_reading_list')
+    def test_remove_book(self, mock_remove_from_reading_list, mock_connect):
+        mock_conn = MagicMock()
+        mock_conn.close = MagicMock()
+        mock_connect.return_value = mock_conn
+
+        reading_list = service.ReadingList(user_id=1)
+        mock_conn.close.assert_called_once()
+        reading_list.remove_book(book_id=101)
+        mock_remove_from_reading_list.assert_called_once_with(
+            1, 101, mock_conn)
+        mock_conn.close.assert_has_calls(([], []))
+
+    @patch('sqlite3.connect')
+    @patch('backend.database.update_reading_status')
+    def test_change_reading_status(
+            self, mock_update_reading_status, mock_connect):
+        mock_conn = MagicMock()
+        mock_conn.close = MagicMock()
+        mock_connect.return_value = mock_conn
+        user_id = 1
+        book_id = 101
+        new_status = models.StatusEnum.started
+
+        reading_list = service.ReadingList(user_id)
+        mock_conn.close.assert_called_once()
+        reading_list.change_reading_status(book_id, new_status)
+
+        mock_update_reading_status.assert_called_once_with(
+            user_id, book_id, new_status, mock_conn)
+        mock_conn.close.assert_has_calls(([], []))
+
+    @patch('sqlite3.connect')
+    @patch('backend.database.get_books_by_genre')
+    @patch('backend.service.ReadingList.get_genres', return_value=['Fantasy'])
+    @patch('backend.service.Book.from_db')
+    def test_get_recommendations(
+            self, mock_from_db, mock_get_genres,
+            mock_get_books_by_genre, mock_connect):
+        mock_conn = MagicMock()
+        mock_conn.close = MagicMock()
+        mock_connect.return_value = mock_conn
+
+        mock_get_genres.return_value = ["Fantasy", "Science Fiction"]
+        mock_get_books_by_genre.return_value = [
+            (101,
+             'Fantasy Book',
+             'Author A',
+             'Fantasy',
+             50),
+            (102,
+             'Sci-Fi Book',
+             'Author B',
+             'Science Fiction',
+             30)]
+        book_mocks = [
+            MagicMock(
+                id=101, genre='Fantasy', reads=50), MagicMock(
+                id=102, genre='Science Fiction', reads=30)]
+        mock_from_db.side_effect = book_mocks
+
+        reading_list = service.ReadingList(user_id=1)
+        reading_list.books = [book_mocks[0]]
+        recommendations = reading_list.get_recommendations(n=2)
+
+        self.assertEqual(len(recommendations), 1)
+        self.assertEqual(recommendations[0].id, 102)
+        mock_get_books_by_genre.assert_has_calls([unittest.mock.call(
+            'Fantasy', mock_conn),
+            unittest.mock.call('Science Fiction', mock_conn)])
+        mock_from_db.assert_has_calls(
+            [unittest.mock.call(101), unittest.mock.call(102)], any_order=True)
+        mock_conn.close.assert_has_calls(([], []))
