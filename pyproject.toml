@@ -12,6 +12,7 @@ uvicorn = {version = "^0.29.0", extras = ["standard"]}
 python-jose = "^3.3.0"
 python-dotenv = "^1.0.1"
 passlib = {version = "^1.7.4", extras = ["bcrypt"]}
+requests = "^2.31.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"
