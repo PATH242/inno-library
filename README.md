@@ -56,3 +56,8 @@ poetry run pytest
 ```bash
 poetry run uvicorn backend.app:app --reload
 ```
+
+6. Run Performance testing with locust
+```bash
+cd tests/performance && locust --users=5 --spawn-rate=3 --run-time=500s
+```
